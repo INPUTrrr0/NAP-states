@@ -70,15 +70,16 @@ def plot_neuron(nonzeros_relu, activations_relu, layer):
         if count>0:
             layer_validneurons.append(neuron)
             axes[0].legend()
-            plt.tight_layout()
-            save_pth = os.path.join("/mfs1/huang/Sophie/NAP-states/mnistfc_256x6_states", 'non_zero_neurons', f'layer{layer}_states')
+            fig.tight_layout()
+            save_pth = os.path.join(os.getcwd(), 'mnistfc_256x6_states', 'non_zero_neurons', f'layer{layer}_states')
             os.makedirs(save_pth, exist_ok=True)
-            plt.savefig(f'{save_pth}/{neuron}')
+            fig.savefig(f'{save_pth}/{neuron}.png', dpi=100)
         #plt.show()
         plt.close()
+        
     
-    os.makedirs(os.path.join("/mfs1/huang/Sophie/NAP-states/mnistfc_256x6_states", 'non_zero_neurons', f'relu{layer}'), exist_ok=True)
-    with open(os.path.join("/mfs1/huang/Sophie/NAP-states/mnistfc_256x6_states", 'non_zero_neurons', f'relu{layer}',f"filtered_relu{layer}_activations.json"), "w") as fp:
+    os.makedirs(os.path.join(os.getcwd(), 'mnistfc_256x6_states', 'non_zero_neurons', f'relu{layer}'), exist_ok=True)
+    with open(os.path.join(os.getcwd(), 'mnistfc_256x6_states', 'non_zero_neurons', f'relu{layer}',f"filtered_relu{layer}_activations.json"), "w") as fp:
       json.dump(layer_states, fp)
 
 
@@ -143,7 +144,7 @@ def main():
     pytorch_model.Relu_25.register_forward_hook(get_activation('relu5'))
     pytorch_model.Relu_27.register_forward_hook(get_activation('relu6'))
     
-    if not os.path.exists(os.path.join("/mfs1/huang/Sophie/NAP-states/mnistfc_256x6_states", 'non_zero_neurons')):
+    if not os.path.exists(os.path.join(os.getcwd(), 'mnistfc_256x6_states', 'non_zero_neurons')):
         # Create list to store label
         labels = []
 
@@ -162,7 +163,7 @@ def main():
                 
                 labels.append(t.item())
         
-        os.makedirs(os.path.join("/mfs1/huang/Sophie/NAP-states/mnistfc_256x6_states", 'non_zero_neurons'), exist_ok=True)
+        os.makedirs(os.path.join(os.getcwd(), 'mnistfc_256x6_states', 'non_zero_neurons'), exist_ok=True)
         # Record all the non-zero neurons
         non_zero_neurons = []
         for layer in dict_relu:
@@ -182,13 +183,13 @@ def main():
                         label = labels[k]
                         non_zero_activation[f'neuron{neuron_num}'][f'label{label}'].append(neuron_activation[k].item())
             
-            os.makedirs(os.path.join("/mfs1/huang/Sophie/NAP-states/mnistfc_256x6_states", 'non_zero_neurons', layer), exist_ok=True)
-            with open(os.path.join("/mfs1/huang/Sophie/NAP-states/mnistfc_256x6_states", 'non_zero_neurons', layer, 'nonzero.txt'), 'w') as f:
+            os.makedirs(os.path.join(os.getcwd(), 'mnistfc_256x6_states', 'non_zero_neurons', layer), exist_ok=True)
+            with open(os.path.join(os.getcwd(), 'mnistfc_256x6_states', 'non_zero_neurons', layer, 'nonzero.txt'), 'w') as f:
                 # write elements of list
                 json.dump(non_zero_neurons, f, indent=4)
                 f.close()
             
-            with open(os.path.join("/mfs1/huang/Sophie/NAP-states/mnistfc_256x6_states", 'non_zero_neurons', layer, 'activation.json'), 'w') as f1:
+            with open(os.path.join(os.getcwd(), 'mnistfc_256x6_states', 'non_zero_neurons', layer, 'activation.json'), 'w') as f1:
                 # write elements of dictionary
                 json.dump(non_zero_activation, f1, indent=4)
                 f1.close()
@@ -199,10 +200,10 @@ def main():
 
     else:
         for relu_num in range(RELU_NUM):
-            with open(os.path.join("/mfs1/huang/Sophie/NAP-states/mnistfc_256x6_states", 'non_zero_neurons', f'relu{relu_num}', 'activation.json'), 'r') as f:
+            with open(os.path.join(os.getcwd(), 'mnistfc_256x6_states', 'non_zero_neurons', f'relu{relu_num}', 'activation.json'), 'r') as f:
                 activations_relu = json.load(f)
             
-            with open(os.path.join("/mfs1/huang/Sophie/NAP-states/mnistfc_256x6_states", 'non_zero_neurons', f'relu{relu_num}', 'nonzero.txt'), 'r') as f1:
+            with open(os.path.join(os.getcwd(), 'mnistfc_256x6_states', 'non_zero_neurons', f'relu{relu_num}', 'nonzero.txt'), 'r') as f1:
                 non_zero_neurons = json.load(f1)
                 
             plot_neuron(non_zero_neurons, activations_relu, relu_num)
